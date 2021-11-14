@@ -2,16 +2,19 @@ import UIKit
 
 class WeatherViewController: UIViewController, UITextFieldDelegate {
 
+
+    
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     
+    var weatherManager = WeatherMamager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         searchTextField.delegate = self
-        let API_KEY = Constants().OpenWeatherAppApiKey
-        print(API_KEY)
+        
     }
     
     
@@ -40,7 +43,11 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         // This gets triggered when endEdditing is true
         //Find the weather
+        if let city = textField.text {
+            weatherManager.fetchWeather(cityName: city)
+        }
         searchTextField.text = ""
+        
     }
 }
 
