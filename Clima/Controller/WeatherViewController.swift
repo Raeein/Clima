@@ -10,7 +10,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         searchTextField.delegate = self
+        let API_KEY = Constants().OpenWeatherAppApiKey
+        print(API_KEY)
     }
+    
     
     
 
@@ -20,6 +23,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTextField.endEditing(true)
+
         return true
     }
     
