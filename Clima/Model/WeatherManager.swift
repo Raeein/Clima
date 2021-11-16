@@ -1,8 +1,14 @@
 import Foundation
 
+protocol WeatherManagerDelegate {
+    func didUpdateWeather(weather: WeatherModel)
+}
+
 struct WeatherManager {
     let API_KEY = Constants().OpenWeatherAppApiKey
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather?"
+    
+    var delegate: WeatherManagerDelegate?
     
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)&appid=\(API_KEY)&units=metric"
@@ -21,7 +27,9 @@ struct WeatherManager {
                 }
                 if let safeData = data {
                     //Add self because in a closure
-                    self.parseJSON(weatherData: safeData)
+                    if let weather = self.parseJSON(weatherData: safeData) {
+                        self.delegate?.didUpdateWeather(weather: weather)
+                    }
                 }
             }
             //Start the task
@@ -30,36 +38,22 @@ struct WeatherManager {
         
     }
     
-    func parseJSON(weatherData: Data) {
+    func parseJSON(weatherData: Data) -> WeatherModel? {
         let decoder = JSONDecoder()
         //.self to show the type of an object
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
             let id = decodedData.weather[0].id
+            let temp = decodedData.main.temp
+            let name = decodedData.name
+            let weather = WeatherModel(conditionID: id, cityName: name, temperature: temp)
+            return weather
         } catch {
             print(error)
+            return nil
         }
     }
     
-    func getConditionName(weatherID: Int) -> String {
-        switch weatherID {
-                case 200...232:
-                    return "cloud.bolt"
-                case 300...321:
-                    return "cloud.drizzle"
-                case 500...531:
-                    return "cloud.rain"
-                case 600...622:
-                    return "cloud.snow"
-                case 701...781:
-                    return "cloud.fog"
-                case 800:
-                    return "sun.max"
-                case 801...804:
-                    return "cloud.bolt"
-                default:
-                    return "cloud"
-                }
-    }
+    
         
 }
